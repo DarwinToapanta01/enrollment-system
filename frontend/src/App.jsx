@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const CARRERAS_PERMITIDAS = [
-  'Ing en Tecnologías de la Información',
-  'Ing en Software',
-  'Ing en Biotecnología',
+  'BSc in Information Technology',
+  'BSc in Software Engineering',
+  'BSc in Biotechnology',
 ];
 
 const SEMESTRES_PERMITIDOS = Array.from(
@@ -18,7 +18,7 @@ async function api(path, options = {}) {
     headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
   });
   const data = response.status === 204 ? null : await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data?.error || `La solicitud falló (${response.status}).`);
+  if (!response.ok) throw new Error(data?.error || `The request failed (${response.status}).`);
   return data;
 }
 
@@ -49,7 +49,7 @@ function Notice({ notice, onClose }) {
   return (
     <div role="status" className={`flex items-center justify-between gap-3 rounded-2xl border px-5 py-4 text-sm shadow-sm ${notice.type === 'error' ? 'border-rose-200 bg-rose-50/80 text-rose-800' : 'border-emerald-200 bg-emerald-50/80 text-emerald-800'}`}>
       <span className="font-medium">{notice.text}</span>
-      <button aria-label="Cerrar aviso" onClick={onClose} className="rounded-lg p-1 text-lg font-bold hover:bg-black/5">×</button>
+      <button aria-label="Close notification" onClick={onClose} className="rounded-lg p-1 text-lg font-bold hover:bg-black/5">×</button>
     </div>
   );
 }
@@ -64,7 +64,7 @@ export default function App() {
   const [notice, setNotice] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState('cursos'); // 'cursos' o 'mis-matriculas'
+  const [activeTab, setActiveTab] = useState('courses'); // 'courses' or 'my-enrollments'
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -102,7 +102,7 @@ export default function App() {
       if (authMode === 'login') {
         const result = await api('/auth/login', { method: 'POST', body: JSON.stringify(loginForm) });
         setUser(result.user);
-        setNotice({ type: 'success', text: '¡Bienvenido de nuevo al sistema!' });
+        setNotice({ type: 'success', text: 'Welcome back to the system!' });
         setLoginForm(blankLogin);
       } else {
         const result = await api('/auth/register', {
@@ -110,7 +110,7 @@ export default function App() {
           body: JSON.stringify({ ...registerForm, semestre: Number(registerForm.semestre) }),
         });
         setUser(result.user);
-        setNotice({ type: 'success', text: 'Cuenta creada con éxito. Ya puedes gestionar tus matrículas.' });
+        setNotice({ type: 'success', text: 'Account created successfully. You can now manage your enrollments.' });
         setRegisterForm(blankRegister);
       }
     } catch (error) {
@@ -123,7 +123,7 @@ export default function App() {
   async function enroll(courseId) {
     try {
       const result = await api('/matriculas', { method: 'POST', body: JSON.stringify({ cursoId: Number(courseId) }) });
-      setNotice({ type: 'success', text: result.mensaje || '¡Matrícula realizada exitosamente!' });
+      setNotice({ type: 'success', text: result.mensaje || 'Enrollment completed successfully!' });
       await loadDashboard();
     } catch (error) {
       setNotice({ type: 'error', text: error.message });
@@ -136,7 +136,7 @@ export default function App() {
       setUser(null);
       setCourses([]);
       setEnrollments([]);
-      setNotice({ type: 'success', text: 'Has cerrado sesión de forma segura.' });
+      setNotice({ type: 'success', text: 'You have safely logged out.' });
     } catch (error) {
       setNotice({ type: 'error', text: error.message });
     }
@@ -149,17 +149,17 @@ export default function App() {
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-          <p className="text-sm font-medium">Cargando portal universitario...</p>
+          <p className="text-sm font-medium">Loading university portal...</p>
         </div>
       </div>
     );
   }
 
-  // DISEÑO 1: PANTALLA DE AUTENTICACIÓN (Split-screen moderno)
+  // DESIGN 1: AUTHENTICATION SCREEN (Modern split-screen)
   if (!user) {
     return (
       <div className="min-h-screen lg:grid lg:grid-cols-12 bg-slate-900 text-slate-100">
-        {/* Panel izquierdo decorativo con NUEVO LOGO */}
+        {/* Left decorative panel */}
         <div className="relative hidden lg:col-span-5 lg:flex flex-col justify-between p-12 bg-gradient-to-br from-indigo-900 via-slate-900 to-violet-950 border-r border-slate-800">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/40">
@@ -170,25 +170,25 @@ export default function App() {
               </svg>
             </div>
             <div>
-              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Sistema de Matrícula</p>
+              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Enrollment System</p>
               <span className="font-extrabold tracking-tight text-lg text-white">Academia U.</span>
             </div>
           </div>
           <div className="space-y-4 my-auto">
-            <span className="inline-block rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20">Gestión Inteligente</span>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl leading-tight">Tu carrera universitaria centralizada.</h1>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-md">Inscripciones en tiempo real y gestión de matrículas sin complicaciones.</p>
+            <span className="inline-block rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20">Smart Management</span>
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl leading-tight">Your academic career centralized.</h1>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-md">Real-time course registration and hassle-free enrollment management.</p>
           </div>
         </div>
 
-        {/* Panel derecho (Formulario) */}
+        {/* Right panel (Form) */}
         <div className="lg:col-span-7 flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-20 bg-slate-950">
           <div className="mx-auto w-full max-w-md space-y-6">
             <Notice notice={notice} onClose={() => setNotice({ type: '', text: '' })} />
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight text-white">{authMode === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta estudiantil'}</h2>
-              <p className="text-sm text-slate-400">{authMode === 'login' ? 'Ingresa tus credenciales para acceder al sistema.' : 'Completa el formulario para registrarte en el portal.'}</p>
+              <h2 className="text-2xl font-bold tracking-tight text-white">{authMode === 'login' ? 'Welcome Back' : 'Create Student Account'}</h2>
+              <p className="text-sm text-slate-400">{authMode === 'login' ? 'Enter your credentials to access the system.' : 'Complete the form to register in the portal.'}</p>
             </div>
 
             <div className="grid grid-cols-2 rounded-2xl bg-slate-900 p-1.5 border border-slate-800">
@@ -196,13 +196,13 @@ export default function App() {
                 onClick={() => { setAuthMode('login'); setNotice({ type: '', text: '' }); }}
                 className={`rounded-xl py-2.5 text-xs font-bold transition-all ${authMode === 'login' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
               >
-                Iniciar Sesión
+                Sign In
               </button>
               <button
                 onClick={() => { setAuthMode('register'); setNotice({ type: '', text: '' }); }}
                 className={`rounded-xl py-2.5 text-xs font-bold transition-all ${authMode === 'register' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
               >
-                Registrarse
+                Register
               </button>
             </div>
 
@@ -210,22 +210,22 @@ export default function App() {
               {authMode === 'register' && (
                 <>
                   <Field
-                    label="Nombre Completo"
+                    label="Full Name"
                     value={registerForm.nombre}
                     onChange={(e) => setRegisterForm({ ...registerForm, nombre: e.target.value })}
-                    placeholder="Ej. Ana Torres"
+                    placeholder="e.g. Ana Torres"
                     autoComplete="name"
                   />
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Carrera</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Degree Program</label>
                     <select
                       className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100"
                       value={registerForm.carrera}
                       onChange={(e) => setRegisterForm({ ...registerForm, carrera: e.target.value })}
                       required
                     >
-                      <option value="">Selecciona tu carrera</option>
+                      <option value="">Select your program</option>
                       {CARRERAS_PERMITIDAS.map((carrera) => (
                         <option key={carrera} value={carrera}>{carrera}</option>
                       ))}
@@ -233,7 +233,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Semestre (1 al 9)</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Semester (1 to 9)</label>
                     <select
                       className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100"
                       value={registerForm.semestre}
@@ -241,7 +241,7 @@ export default function App() {
                       required
                     >
                       {SEMESTRES_PERMITIDOS.map((semestre) => (
-                        <option key={semestre} value={semestre}>Semestre {semestre}</option>
+                        <option key={semestre} value={semestre}>Semester {semestre}</option>
                       ))}
                     </select>
                   </div>
@@ -249,16 +249,16 @@ export default function App() {
               )}
 
               <Field
-                label="Correo Electrónico"
+                label="Email Address"
                 type="email"
                 value={authMode === 'login' ? loginForm.email : registerForm.email}
                 onChange={(e) => authMode === 'login' ? setLoginForm({ ...loginForm, email: e.target.value }) : setRegisterForm({ ...registerForm, email: e.target.value })}
-                placeholder="estudiante@universidad.edu"
+                placeholder="student@university.edu"
                 autoComplete="email"
               />
 
               <Field
-                label="Contraseña"
+                label="Password"
                 type="password"
                 value={authMode === 'login' ? loginForm.password : registerForm.password}
                 onChange={(e) => authMode === 'login' ? setLoginForm({ ...loginForm, password: e.target.value }) : setRegisterForm({ ...registerForm, password: e.target.value })}
@@ -270,7 +270,7 @@ export default function App() {
                 disabled={submitting}
                 className="w-full rounded-2xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition-all hover:bg-indigo-500 disabled:opacity-50 mt-2"
               >
-                {submitting ? 'Procesando...' : authMode === 'login' ? 'Entrar al Sistema' : 'Crear Cuenta'}
+                {submitting ? 'Processing...' : authMode === 'login' ? 'Sign In to Portal' : 'Create Account'}
               </button>
             </form>
           </div>
@@ -279,10 +279,10 @@ export default function App() {
     );
   }
 
-  // DISEÑO 2: PANEL PRINCIPAL (Dashboard con Sidebar y NUEVO LOGO)
+  // DESIGN 2: MAIN DASHBOARD (SaaS layout with Sidebar)
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row">
-      {/* Sidebar de navegación con NUEVO LOGO */}
+      {/* Navigation Sidebar */}
       <aside className="w-full md:w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0">
         <div className="space-y-8">
           <div className="flex items-center gap-3">
@@ -300,28 +300,28 @@ export default function App() {
           </div>
 
           <div className="rounded-2xl bg-slate-900 p-4 border border-slate-800/80 space-y-1">
-            <p className="text-xs text-slate-400 font-medium">Estudiante activo</p>
+            <p className="text-xs text-slate-400 font-medium">Active student</p>
             <p className="text-sm font-bold text-white truncate">{user.nombre}</p>
             <p className="text-xs text-indigo-400 font-medium truncate">{user.carrera}</p>
             <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 mt-2">
-              <span>Semestre: {user.semestre}</span>
+              <span>Semester: {user.semestre}</span>
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-400 font-bold border border-emerald-500/20">Regular</span>
             </div>
           </div>
 
           <nav className="space-y-1">
             <button
-              onClick={() => setActiveTab('cursos')}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'cursos' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}
+              onClick={() => setActiveTab('courses')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'courses' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}
             >
-              <span>📚 Oferta de Cursos</span>
+              <span>📚 Course Catalog</span>
               <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{courses.length}</span>
             </button>
             <button
-              onClick={() => setActiveTab('mis-matriculas')}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'mis-matriculas' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}
+              onClick={() => setActiveTab('my-enrollments')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'my-enrollments' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}
             >
-              <span>🎓 Mis Matrículas</span>
+              <span>🎓 My Enrollments</span>
               <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{enrollments.length}</span>
             </button>
           </nav>
@@ -332,37 +332,37 @@ export default function App() {
             onClick={logout}
             className="w-full rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400 transition-all"
           >
-            Cerrar Sesión
+            Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Contenido Principal */}
+      {/* Main Content */}
       <main className="flex-1 p-6 md:p-10 overflow-y-auto space-y-8 bg-slate-900">
         <Notice notice={notice} onClose={() => setNotice({ type: '', text: '' })} />
 
-        {/* Header Superior del Dashboard */}
+        {/* Dashboard Top Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-              {activeTab === 'cursos' ? 'Catálogo de Asignaturas' : 'Historial de Matrículas'}
+              {activeTab === 'courses' ? 'Course Catalog' : 'Enrollment History'}
             </h1>
             <p className="text-sm text-slate-400 mt-1">
-              {activeTab === 'cursos' ? 'Selecciona los cursos disponibles para inscribirte este periodo.' : 'Revisa las asignaturas en las que te encuentras matriculado actualmente.'}
+              {activeTab === 'courses' ? 'Select available courses to register for this term.' : 'Review the subjects you are currently enrolled in.'}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-slate-800/80 border border-slate-700/60 px-4 py-2 text-xs font-semibold text-slate-300">
-              Total Cursos: <span className="text-indigo-400 font-bold">{courses.length}</span>
+              Total Courses: <span className="text-indigo-400 font-bold">{courses.length}</span>
             </div>
             <div className="rounded-xl bg-slate-800/80 border border-slate-700/60 px-4 py-2 text-xs font-semibold text-slate-300">
-              Matriculados: <span className="text-emerald-400 font-bold">{enrollments.length}</span>
+              Enrolled: <span className="text-emerald-400 font-bold">{enrollments.length}</span>
             </div>
           </div>
         </div>
 
-        {/* Vista: Cursos */}
-        {activeTab === 'cursos' && (
+        {/* View: Courses */}
+        {activeTab === 'courses' && (
           <div>
             {courses.length ? (
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -373,20 +373,20 @@ export default function App() {
                     <div key={course.id} className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-xl transition-all hover:border-indigo-500/50 hover:shadow-indigo-500/10">
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">Curso #{course.id}</span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">Course #{course.id}</span>
                           <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${Number(cupos) > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                            {cupos} cupos
+                            {cupos} seats left
                           </span>
                         </div>
                         <h3 className="mt-4 text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">{course.nombre}</h3>
-                        <p className="mt-1 text-sm text-slate-400">Docente: <span className="text-slate-200 font-medium">{course.docente}</span></p>
+                        <p className="mt-1 text-sm text-slate-400">Instructor: <span className="text-slate-200 font-medium">{course.docente}</span></p>
                       </div>
                       <button
                         disabled={enrolled || Number(cupos) < 1}
                         onClick={() => enroll(course.id)}
                         className={`mt-6 w-full rounded-xl px-4 py-3 text-sm font-bold transition-all ${enrolled ? 'cursor-not-allowed bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : Number(cupos) < 1 ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500'}`}
                       >
-                        {enrolled ? '✓ Ya estás matriculado' : Number(cupos) < 1 ? 'Sin cupos disponibles' : 'Matricularme ahora'}
+                        {enrolled ? '✓ Already Enrolled' : Number(cupos) < 1 ? 'No Seats Available' : 'Enroll Now'}
                       </button>
                     </div>
                   );
@@ -394,24 +394,24 @@ export default function App() {
               </div>
             ) : (
               <div className="rounded-2xl border border-slate-800 bg-slate-950 p-12 text-center text-slate-400">
-                No hay cursos disponibles cargados en la base de datos.
+                No available courses found in the database.
               </div>
             )}
           </div>
         )}
 
-        {/* Vista: Mis Matrículas */}
-        {activeTab === 'mis-matriculas' && (
+        {/* View: My Enrollments */}
+        {activeTab === 'my-enrollments' && (
           <div className="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-xl">
             {enrollments.length ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
                   <thead className="bg-slate-900 text-xs uppercase tracking-wider text-slate-400">
                     <tr>
-                      <th className="px-6 py-4 font-semibold">Asignatura</th>
-                      <th className="px-6 py-4 font-semibold">Docente Encargado</th>
-                      <th className="px-6 py-4 font-semibold">Fecha de Matrícula</th>
-                      <th className="px-6 py-4 font-semibold text-right">Estado</th>
+                      <th className="px-6 py-4 font-semibold">Course</th>
+                      <th className="px-6 py-4 font-semibold">Instructor</th>
+                      <th className="px-6 py-4 font-semibold">Enrollment Date</th>
+                      <th className="px-6 py-4 font-semibold text-right">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60">
@@ -421,7 +421,7 @@ export default function App() {
                         <td className="px-6 py-4 text-slate-300">{item.docente}</td>
                         <td className="px-6 py-4 text-slate-400">{new Date(item.fechaMatricula).toLocaleDateString()}</td>
                         <td className="px-6 py-4 text-right">
-                          <span className="inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400 border border-emerald-500/20">Inscrito</span>
+                          <span className="inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400 border border-emerald-500/20">Enrolled</span>
                         </td>
                       </tr>
                     ))}
@@ -430,14 +430,14 @@ export default function App() {
               </div>
             ) : (
               <div className="p-12 text-center text-slate-400">
-                Todavía no te has matriculado en ningún curso. Explora la pestaña de cursos para inscribirte.
+                You are not enrolled in any courses yet. Check the course catalog tab to register.
               </div>
             )}
           </div>
         )}
 
         <footer className="pt-8 border-t border-slate-800/80 text-center text-xs text-slate-500">
-          Sistema de Matrículas Universitario
+          University Enrollment System
         </footer>
       </main>
     </div>
