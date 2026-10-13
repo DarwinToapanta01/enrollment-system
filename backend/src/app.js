@@ -1,0 +1,27 @@
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const authRoutes = require('./routes/authRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const enrollmentRoutes = require('./routes/enrollmentRoutes');
+const notFound = require('./middleware/notFound');
+const errorHandler = require('./middleware/errorHandler');
+const requireSameOrigin = require('./middleware/requireSameOrigin');
+
+const app = express();
+app.disable('x-powered-by');
+app.use(helmet());
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173', credentials: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(cookieParser());
+app.use(requireSameOrigin);
+app.get('/api/health', (req, res) => res.json({ status: 'ok', servicio: 'matricula-backend' }));
+app.use('/api/auth', authRoutes);
+app.use('/api/estudiantes', studentRoutes);
+app.use('/api/cursos', courseRoutes);
+app.use('/api/matriculas', enrollmentRoutes);
+app.use(notFound);
+app.use(errorHandler);
+module.exports = app;
