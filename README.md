@@ -1,49 +1,53 @@
-# Sistema de Matrícula Universitaria — Arquitectura en capas
+# University Enrollment System — Layered Architecture
 
-Proyecto académico de mejora arquitectónica del repositorio proporcionado por el docente. La solución mantiene un backend monolítico con Node.js y Express, organizado en rutas, controladores, servicios y repositorios. El frontend utiliza React, Vite y Tailwind CSS; PostgreSQL almacena estudiantes, cuentas, cursos y matrículas.
+Academic project focused on improving the architecture of the repository provided by the instructor. The solution maintains a monolithic backend built with Node.js and Express, organized into routes, controllers, services, and repositories. The frontend uses React, Vite, and Tailwind CSS, while PostgreSQL stores student records, user accounts, courses, and enrollments.
 
-## Tecnologías
+## Technologies
 
 - **Frontend:** React, Vite, Tailwind CSS.
 - **Backend:** Node.js, Express, JavaScript.
-- **Comunicación:** API REST sobre HTTP/JSON.
-- **Datos:** PostgreSQL y consultas parametrizadas mediante `pg`.
-- **Autenticación:** JWT firmado, cookie `HttpOnly`, hash de contraseña con bcryptjs.
-- **Protecciones adicionales:** Helmet, limitación de intentos en endpoints de autenticación, CORS configurado y middleware de autenticación.
-- **Pruebas:** Node.js test runner.
+- **Communication:** REST API over HTTP/JSON.
+- **Data storage:** PostgreSQL with parameterized queries using `pg`.
+- **Authentication:** Signed JWTs, `HttpOnly` cookies, and password hashing with bcryptjs.
+- **Additional security measures:** Helmet, rate limiting for authentication endpoints, configured CORS, and authentication middleware.
+- **Testing:** Node.js test runner.
 
-## Alcance de cuentas
+## Account Scope
 
-La aplicación permite crear cuentas únicamente con el rol `ESTUDIANTE`. El registro crea el perfil académico y la cuenta de acceso en una transacción. Los estudiantes pueden consultar cursos y gestionar sus propias matrículas. La administración de cursos no se expone a cuentas de estudiante; los cursos iniciales se cargan mediante `backend/sql/seed.sql`.
+The application allows users to register accounts exclusively with the `ESTUDIANTE` (STUDENT) role. Registration creates the academic profile and user account within a database transaction. Students can browse available courses and manage their own enrollments.
 
-La cookie JWT se configura como `HttpOnly` y `SameSite=Strict`. En producción debe usarse HTTPS, un `JWT_SECRET` aleatorio y suficientemente largo, y debe revisarse la estrategia de protección CSRF y CORS conforme al dominio final.
+Course administration is not exposed to student accounts. Initial course data is loaded through `backend/sql/seed.sql`.
 
-## Requisitos
+The JWT cookie is configured with the `HttpOnly` and `SameSite=Strict` attributes. In production, HTTPS and a sufficiently long, randomly generated `JWT_SECRET` must be used. The CSRF protection strategy and CORS configuration must also be reviewed according to the final deployment domain.
 
-- Node.js 20 o superior.
+## Requirements
+
+- Node.js 20 or later.
 - npm.
-- PostgreSQL 14 o superior.
+- PostgreSQL 14 or later.
 
-## Configuración de PostgreSQL
+## PostgreSQL Configuration
 
-1. Crear la base de datos:
+1. Create the database:
 
    ```sql
    CREATE DATABASE matricula_universitaria;
    ```
 
-2. Aplicar esquema y datos iniciales:
+2. Apply the database schema and initial data:
 
    ```bash
    psql -U postgres -d matricula_universitaria -f backend/sql/schema.sql
    psql -U postgres -d matricula_universitaria -f backend/sql/seed.sql
    ```
 
-3. Copiar `backend/.env.example` a `backend/.env` y configurar `DATABASE_URL`, `JWT_SECRET`, `PORT` y `FRONTEND_ORIGIN`. No subir `.env` a GitHub.
+3. Copy `backend/.env.example` to `backend/.env` and configure `DATABASE_URL`, `JWT_SECRET`, `PORT`, and `FRONTEND_ORIGIN`.
 
-## Instalación y ejecución
+   **Do not commit the `.env` file to GitHub.**
 
-Desde la raíz:
+## Installation and Execution
+
+From the project root directory, run:
 
 ```bash
 npm install
@@ -52,28 +56,33 @@ npm install --prefix frontend
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`  
-API: `http://localhost:3000/api/health`
+Frontend: [http://localhost:5173](http://localhost:5173)
 
-## Endpoints
+API health check: [http://localhost:3000/api/health](http://localhost:3000/api/health)
 
-- `GET /api/health`
-- `POST /api/auth/register` — crea una cuenta de estudiante.
-- `POST /api/auth/login` — inicia sesión.
-- `GET /api/auth/me` — obtiene la cuenta autenticada.
-- `POST /api/auth/logout` — cierra sesión.
-- `GET /api/cursos` — consulta el catálogo.
-- `GET /api/matriculas/mis-matriculas` — consulta las matrículas del estudiante autenticado.
-- `POST /api/matriculas` — crea una matrícula para el estudiante autenticado; el cliente solo envía `cursoId`.
+## API Endpoints
 
-## Pruebas
+- `GET /api/health` — checks the API health status.
+- `POST /api/auth/register` — registers a student account.
+- `POST /api/auth/login` — authenticates a user.
+- `GET /api/auth/me` — retrieves the currently authenticated account.
+- `POST /api/auth/logout` — logs out the current user.
+- `GET /api/cursos` — retrieves the course catalog.
+- `GET /api/matriculas/mis-matriculas` — retrieves enrollments belonging to the authenticated student.
+- `POST /api/matriculas` — creates an enrollment for the authenticated student; the client only submits `cursoId`.
+
+## Testing
+
+Run the automated tests from the project root:
 
 ```bash
 npm test
 ```
 
-Las pruebas unitarias cubren validaciones generales, política básica de contraseña/correo y comprobación de origen. Las pruebas de integración con PostgreSQL y los flujos HTTP de autenticación deben ejecutarse antes de afirmar que el sistema completo funciona correctamente.
+Unit tests cover general validation rules, basic password and email policies, and origin checks. PostgreSQL integration tests and HTTP authentication flows must be executed before claiming that the entire system has been successfully verified.
 
-## Decisiones de arquitectura
+## Architecture Decisions
 
-Los registros RDA/ADR se encuentran en `docs/adr/`. El estado de cada decisión debe actualizarse solo después de verificar la implementación y registrar los resultados de pruebas reales.
+Architecture Decision Records (ADRs), also referred to as Architecture Decision Records (RDA), are located in `docs/adr/`.
+
+The status of each decision should only be updated after the implementation has been verified and actual test results have been documented.
