@@ -29,8 +29,43 @@ async function hasCapacity(courseId) {
 }
 
 async function create(studentId, courseId) {
-  const { rows } = await db.query('INSERT INTO matriculas (estudiante_id, curso_id) VALUES ($1, $2) RETURNING id, estudiante_id AS "estudianteId", curso_id AS "cursoId"', [studentId, courseId]);
-  return rows[0];
+  const client = await db.pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Serialize enrollments per course to protect its available capacity.
+    const course = await client.query('SELECT id, cupos FROM cursos WHERE id = $1 FOR UPDATE', [courseId]);
+    if (!course.rows[0]) {
+      await client.query('COMMIT');
+      return { status: 'COURSE_NOT_FOUND' };
+    }
+
+    const duplicate = await client.query(
+      'SELECT id FROM matriculas WHERE estudiante_id = $1 AND curso_id = $2',
+      [studentId, courseId],
+    );
+    if (duplicate.rows[0]) {
+      await client.query('COMMIT');
+      return { status: 'DUPLICATE_ENROLLMENT' };
+    }
+
+    const enrolled = await client.query('SELECT COUNT(*)::int AS total FROM matriculas WHERE curso_id = $1', [courseId]);
+    if (Number(enrolled.rows[0].total) >= Number(course.rows[0].cupos)) {
+      await client.query('COMMIT');
+      return { status: 'COURSE_FULL' };
+    }
+
+    const { rows } = await client.query(
+      'INSERT INTO matriculas (estudiante_id, curso_id) VALUES ($1, $2) RETURNING id, estudiante_id AS "estudianteId", curso_id AS "cursoId"',
+      [studentId, courseId],
+    );
+    await client.query('COMMIT');
+    return { status: 'CREATED', enrollment: rows[0] };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 async function report() {

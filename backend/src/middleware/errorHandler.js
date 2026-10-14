@@ -2,6 +2,12 @@ function errorHandler(error, req, res, next) {
   if (res.headersSent) return next(error);
 
   if (error.code === '23505') {
+    if (error.constraint === 'usuarios_email_key') {
+      return res.status(409).json({ error: 'Ya existe una cuenta con ese correo electrÃ³nico.', code: 'EMAIL_EXISTS' });
+    }
+    if (error.constraint === 'uq_matricula_estudiante_curso') {
+      return res.status(409).json({ error: 'Ya estÃ¡ matriculado en esta materia durante el semestre actual.', code: 'DUPLICATE_ENROLLMENT' });
+    }
     return res.status(409).json({ error: 'El registro ya existe.', code: 'DUPLICATE_RECORD' });
   }
   if (error.code === '23503') {

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const CARRERAS_PERMITIDAS = [
-  'BSc in Information Technology',
-  'BSc in Software Engineering',
-  'BSc in Biotechnology',
+  'Ing en TecnologÃ­as de la InformaciÃ³n',
+  'Ing en Software',
+  'Ing en BiotecnologÃ­a',
 ];
 
 const SEMESTRES_PERMITIDOS = Array.from(
@@ -348,7 +348,7 @@ export default function App() {
               {activeTab === 'courses' ? 'Course Catalog' : 'Enrollment History'}
             </h1>
             <p className="text-sm text-slate-400 mt-1">
-              {activeTab === 'courses' ? 'Select available courses to register for this term.' : 'Review the subjects you are currently enrolled in.'}
+              {activeTab === 'courses' ? `Materias disponibles para el semestre ${user.semestre}.` : 'Review the subjects you are currently enrolled in.'}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -373,7 +373,7 @@ export default function App() {
                     <div key={course.id} className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-xl transition-all hover:border-indigo-500/50 hover:shadow-indigo-500/10">
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">Course #{course.id}</span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">Semestre {course.semestre} · Materia #{course.id}</span>
                           <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${Number(cupos) > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
                             {cupos} seats left
                           </span>
@@ -394,7 +394,7 @@ export default function App() {
               </div>
             ) : (
               <div className="rounded-2xl border border-slate-800 bg-slate-950 p-12 text-center text-slate-400">
-                No available courses found in the database.
+                No hay materias disponibles para tu semestre.
               </div>
             )}
           </div>
